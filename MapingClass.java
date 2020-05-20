@@ -229,31 +229,78 @@ class Message {
 			}
 
 }
-class Status{
-				
+class Status extends Contact{
+				static int numofstatus=0;
 				static 	HashMap<Integer,ArrayList<String>> ContactStatusDetails =new HashMap<Integer,ArrayList<String>>();
 				static 	HashMap<Integer,String> MyStatusDetails =new HashMap<Integer,String>();
 				public int NumberOfMyStatus(){
-						int count=MyStatusDetails.size()+1;
-						return count;
+						 numofstatus=numofstatus+1;
+						return numofstatus;
 				}
 
-				public  void AddMystatus(String text){
-					System.out.println(text);
-					System.out.println(NumberOfMyStatus());
+				public  void AddMystatus(String text){					
 					MyStatusDetails.put(NumberOfMyStatus(),text);
 					System.out.println("status added.....");
 				}
 				public void GetMayStatus(){
-					System.out.println("My Status:-");
-					for(int statusid=0;statusid<MyStatusDetails.size();statusid++){
-								System.out.println("status Id"+statusid+" "+"Status:"+MyStatusDetails.get(statusid));
-					}
+					if(MyStatusDetails.size()>0){	
+						for (Integer key: MyStatusDetails.keySet()) {
+   									 System.out.print("key : " + key);
+   								 	System.out.println("status : " + MyStatusDetails.get(key));
+						}
+
+
+					}else{						
+							System.out.println("My Status is emty.....");	
+						}
+					
 				}
+				public void DeleteMyParticulareStatus(int statusid){
+					if(MyStatusDetails.containsKey(statusid)){
+							String status=MyStatusDetails.get(statusid);
+							System.out.println("deleting status "+status+"");
+							MyStatusDetails.remove(statusid);
+							System.out.println("status delected....");
+					}else{
+						System.out.println("Invalide statusid........");
+					}
+							
+				}
+				public void DeleteMyAllStatus(){
+						if(MyStatusDetails.size()>0){
+							MyStatusDetails.clear();
+							numofstatus=0;
+							System.out.println("All status delected....");	
+						}else{						
+							System.out.println("My Status already emty.....");	
+						}
+				}
+				public void ContactStatusAdd(int contactid,String statustext){
+							if(AllContactDetails.containsKey(contactid)){
+								if(ContactStatusDetails.containsKey(contactid)){									
+										ContactStatusDetails.get(contactid).add(statustext);										
+										System.out.println("status Added.....");
+								}else{
+										ArrayList<String> emty=new ArrayList<>();
+										emty.add(statustext);
+										ContactStatusDetails.put(contactid,emty);						
+										System.out.println("status Added.....");
+								}
+							}else{
+								System.out.println("Invalide contact id.......");
+							}
 
-
+				}
+				public static void ShowpadiculareContactStatus(int contactid){
+						if(ContactStatusDetails.containsKey(contactid)){
+									ArrayList<String> values=ContactStatusDetails.get(contactid);
+									for(String words:values){
+										System.out.println(words);
+									}								
+						}	
+										
+				}
 }
-
 class MapingClass extends Message {
 		static Contact contactobj=new Contact();
 		static Chats chatobj=new Chats();
@@ -289,15 +336,14 @@ class MapingClass extends Message {
 								}else if(splitbyslace.length >0 && splitbyslace[0].equals("status")){
 
 											if(splitbyslace.length ==2){
-														System.out.println("cid"+splitbyslace[1]);
+														statusobj.ShowpadiculareContactStatus(Integer.parseInt(splitbyslace[1]));
 											}else if(splitbyslace.length ==1){
-													    	System.out.println("Show all MyStatus only......	");
+													   statusobj.GetMayStatus();
+													  
 											}
 											else{
 																System.out.println("Rong URl.........");
-											}	
-
-
+											}
 								}
 
 						}else if(splitbyspace[0].equals("post")){
@@ -332,6 +378,7 @@ class MapingClass extends Message {
 					 						if(posturilresource.length == 3){
 					 									System.out.println("status texts="+posturilresource[2]);
 					 									System.out.println("status id"+posturilresource[1]);
+					 									 statusobj.ContactStatusAdd(Integer.parseInt(posturilresource[1]),posturilresource[2]);
 					 						}else if(posturilresource.length == 2){					 								
 					 									statusobj.AddMystatus(posturilresource[1]);
 					 						}else{
@@ -343,7 +390,7 @@ class MapingClass extends Message {
 					 			System.out.println("Something wend to rong.......");
 					 		}
 						}else if(splitbyspace[0].equals("delete")){
-										System.out.println(splitbyspace[1]);
+										
 										String[] deltecontect=splitbyspace[1].split("/");
 										if(deltecontect[0].equals("contacts")){
 
@@ -364,6 +411,15 @@ class MapingClass extends Message {
 													chatobj.DeleteAllChats();
 												}
 
+										}else if(deltecontect[0].equals("status")){
+
+
+												if(deltecontect.length ==2){
+
+														statusobj.DeleteMyParticulareStatus(Integer.parseInt(deltecontect[1]));			
+												}else if(deltecontect.length ==1){
+														statusobj.DeleteMyAllStatus();
+												}
 										}
 
 										
@@ -405,7 +461,6 @@ class MapingClass extends Message {
 						else{
 							ProcessComment(url);
 						}
-
-				}		
+				}	
 	}
 }
